@@ -1,0 +1,59 @@
+﻿@model IEnumerable<EventEase.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings List";
+}
+
+<h1>Bookings</h1>
+
+<form asp-action="Index" method="get">
+    <div class="form-group">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Search by Booking ID or Event Name..." />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Search</button>
+</form>
+
+<hr />
+
+@foreach (var booking in Model)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <strong>Booking ID:</strong> @booking.BookingId
+        </div>
+        <div class="card-body">
+
+            <div class="mb-3">
+                <h5 class="text-primary">Booking Information</h5>
+                <p><strong>Booking Date:</strong> @booking.BookingDate.ToString("yyyy-MM-dd")</p>
+            </div>
+
+            <hr />
+
+            <div class="mb-3">
+                <h5 class="text-success">Event Information</h5>
+                <p><strong>Event Name:</strong> @booking.Event.EventName</p>
+                <p><strong>Event Date:</strong> @booking.Event.EventDate</p>
+                <p><strong>Description:</strong> @booking.Event.Description</p>
+            </div>
+
+            <hr />
+
+            <div class="mb-3">
+                <h5 class="text-info">Venue Information</h5>
+                <p><strong>Venue Name:</strong> @booking.Venue.VenueName</p>
+                <p><strong>Location:</strong> @booking.Venue.Location</p>
+                <p><strong>Capacity:</strong> @booking.Venue.Capacity</p>
+
+                @if (!string.IsNullOrEmpty(booking.Venue.ImageURL))
+                {
+                    <img src="@booking.Venue.ImageURL"
+                         alt="Venue Image"
+                         class="img-fluid mt-2"
+                         style="max-width: 100%; height: auto; object-fit: cover;" />
+                }
+            </div>
+
+        </div>
+    </div>
+}

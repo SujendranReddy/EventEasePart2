@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EventEase.Data;
 using EventEase.Models;
@@ -50,14 +45,27 @@ namespace EventEase.Controllers
         }
 
         // POST: Events/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description")] Event @event)
         {
             if (ModelState.IsValid)
             {
+                var normalizedName = @event.EventName?.Trim().ToLowerInvariant();
+                var eventDate = @event.EventDate;
+
+                // Validation to prevent duplicate Events
+                bool duplicateExists = await _context.Event
+                    .AnyAsync(e =>
+                        e.EventName.ToLower().Trim() == normalizedName &&
+                        e.EventDate == eventDate);
+
+                if (duplicateExists)
+                {
+                    ModelState.AddModelError(string.Empty, "An event with the same name and date already exists.");
+                    return View(@event);
+                }
+
                 _context.Add(@event);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -82,8 +90,6 @@ namespace EventEase.Controllers
         }
 
         // POST: Events/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDate,Description")] Event @event)
@@ -95,6 +101,22 @@ namespace EventEase.Controllers
 
             if (ModelState.IsValid)
             {
+                var normalizedName = @event.EventName?.Trim().ToLowerInvariant();
+                var eventDate = @event.EventDate;
+
+                // Validation to prevent duplicate events
+                bool duplicateExists = await _context.Event
+                    .AnyAsync(e =>
+                        e.EventId != @event.EventId &&
+                        e.EventName.ToLower().Trim() == normalizedName &&
+                        e.EventDate == eventDate);
+
+                if (duplicateExists)
+                {
+                    ModelState.AddModelError(string.Empty, "An event with the same name and date already exists.");
+                    return View(@event);
+                }
+
                 try
                 {
                     _context.Update(@event);
@@ -139,12 +161,25 @@ namespace EventEase.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var @event = await _context.Event.FindAsync(id);
-            if (@event != null)
+            var eventToDelete = await _context.Event
+                .FirstOrDefaultAsync(e => e.EventId == id);
+
+            if (eventToDelete == null)
             {
-                _context.Event.Remove(@event);
+                return NotFound();
             }
 
+            //Validation to prevent the deletion of an event linked to active bookings
+            bool hasActiveBookings = await _context.Booking
+                .AnyAsync(b => b.EventId == id && b.BookingDate > DateTime.Now);
+
+            if (hasActiveBookings)
+            {
+                ModelState.AddModelError(string.Empty, "This event cannot be deleted because there are active bookings.");
+                return View(eventToDelete);
+            }
+
+            _context.Event.Remove(eventToDelete);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

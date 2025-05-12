@@ -8,7 +8,11 @@ body {
     background-repeat: no-repeat;
     color: white;
     line-height: 1.6;
-    margin-bottom: 60px;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    height: 100%; /* Ensure body takes full height */
+    display: flex;
+    flex-direction: column; /* Ensure body behaves like flex container */
 }
 
     body::before {
@@ -20,6 +24,38 @@ body {
         height: 100%;
         background-color: rgba(0, 0, 0, 0.3);
         z-index: -1;
+    }
+
+/* Layout Fixes */
+html, body {
+    height: 100%; /* Ensure full height for body */
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    flex-grow: 1; /* Allow main content to take all remaining space */
+}
+
+footer.footer {
+    margin-top: auto; /* Push footer to bottom */
+    background-color: White;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Additional footer styling */
+footer a {
+    color: SlateGray;
+}
+
+    footer a:hover {
+        color: SteelBlue;
     }
 
 /* Header and Navbar */
@@ -45,26 +81,6 @@ header {
     .navbar-nav .nav-link:hover {
         color: RoyalBlue;
     }
-
-/* Footer */
-footer {
-    background-color: White;
-    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
-    padding: 1rem 2rem;
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-    footer a {
-        color: SlateGray;
-    }
-
-        footer a:hover {
-            color: SteelBlue;
-        }
 
 /* Tables */
 table {
