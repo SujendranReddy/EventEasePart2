@@ -14,7 +14,6 @@ namespace EventEase.Models
         public string? EventName { get; set; }
 
         [Required(ErrorMessage = "Event Date is required.")]
-        [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [Display(Name = "Date of the Event")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime EventDate { get; set; }
