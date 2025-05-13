@@ -94,8 +94,8 @@ namespace Event_Ease.Views
             {
                 return NotFound();
             }
-            ViewData["EventId"] = new SelectList(_context.Event, "EventId", "EventName", booking.EventId);
-            ViewData["VenueId"] = new SelectList(_context.Venue, "VenueId", "VenueName", booking.VenueId);
+            ViewBag.Events = new SelectList(_context.Event, "EventId", "EventName", booking.EventId);
+            ViewBag.Venues = new SelectList(_context.Venue, "VenueId", "VenueName", booking.VenueId);
             return View(booking);
         }
 
